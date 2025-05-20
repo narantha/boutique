@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="refresh" content="0; url=/" />
+    <meta charset="UTF-8" />
+    <title>Redirigiendo...</title>
+    <script>
+      // Redirige cualquier ruta desconocida al index.html
+      sessionStorage.redirect = location.pathname;
+      window.location.href = "/";
+    </script>
   </head>
   <body>
-    <p>Redireccionando a <a href="/">Inicio</a>...</p>
+    Redirigiendo...
   </body>
 </html>
