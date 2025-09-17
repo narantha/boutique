@@ -1,0 +1,126 @@
+.seleccionado {
+border-bottom: 5px solid #afa780;
+}
+.cmp-image__link:focus {
+    outline: none !important; 
+    outline-offset: -2px;
+}
+@media screen and (min-width: 981px) and (max-width: 1080px) {
+.breadcrumb-section {
+	margin-top: 15px !important;
+}
+}
+@media screen and (min-width: 1081px) {
+.menu-ancla {
+display: flex;
+    z-index: 9999;
+position: relative;
+  top: -50px;
+  width: 100%;
+  height: 50px;
+}
+.item-ancla {
+width: 11.1%;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.4);
+display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.item-ancla:hover {
+	border-bottom: 5px solid #afa780;
+}
+.pal-home__h4  {
+margin-bottom: 20px !important;
+width: 800px;
+}
+.breadcrumb-section {
+	/*margin-top: 210px !important;*/
+}
+
+.root .pal-slide-banner--big.banner-redesign, [class*=pal-slide-banner] .pal-slide-banner__title {
+	max-height: 500px;
+}
+@media screen and (min-width: 1081px) {
+  .pal-home__article {
+    position: relative;
+    bottom: auto;
+    margin-top: 40px;
+  }
+}
+@media screen and (max-width: 1080px) {
+  .pal-home__article {
+    position: relative;
+    bottom: auto;
+    margin-top: 20px;
+  }
+}
+.at-element-marker > p {
+	color: #fff !important;
+}
+.root .pal-home__carousel::before {
+	background: none;
+}
+.cmp-image__title {
+	padding: 15px 70px;
+}
+}
+@media screen and (max-width: 980px)  {
+.menu-ancla {
+display: flex;
+    z-index: 9999;
+position: relative;
+  top: -50px;
+  width: 100%;
+  height: 50px;
+overflow-x: scroll;
+}
+.item-ancla {
+width: 100% !important;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.4);
+display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.item-ancla:hover {
+	border-bottom: 5px solid #afa780;
+}
+.pal-home__h4 {
+  margin-bottom: 20px !important;
+}
+
+@media screen and (min-width: 1081px) {
+  .pal-home__h4 {
+    width: 800px;
+  }
+}
+
+@media screen and (max-width: 1080px) {
+  .pal-home__h4 {
+    width: 100% !important;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+}
+
+body .root.banner-principal .breadcrumb-section {
+	display: none !important;
+}
+
+.root .pal-slide-banner--big.banner-redesign, [class*=pal-slide-banner] .pal-slide-banner__title {
+	max-height: 500px;
+}
+.pal-home__article {
+  bottom: 120px !important;
+}
+.at-element-marker > p {
+	color: #fff !important;
+}
+.root .pal-home__carousel::before {
+	background: none;
+}
+.cmp-image__title {
+	padding: 15px 50px;
+}
+}
