@@ -116,3 +116,19 @@ form.addEventListener('submit', e => {
   form.querySelector('input').value = '';
   setTimeout(() => { btn.textContent = 'Sumarme →'; btn.classList.remove('sent'); }, 3000);
 });
+
+/* ── Cookies banner ── */
+const COOKIES_BANNER_KEY = 'cookies_banner_closed';
+const cookiesBanner = document.getElementById('cookiesBanner');
+const cookiesClose = document.getElementById('cookiesClose');
+
+if (cookiesBanner && cookiesClose) {
+  if (localStorage.getItem(COOKIES_BANNER_KEY) === 'true') {
+    cookiesBanner.classList.add('is-hidden');
+  }
+
+  cookiesClose.addEventListener('click', () => {
+    cookiesBanner.classList.add('is-hidden');
+    localStorage.setItem(COOKIES_BANNER_KEY, 'true');
+  });
+}
