@@ -710,6 +710,71 @@ footer.foot { background: var(--cacao); color: var(--bone); padding: 90px 0 30px
   100% { box-shadow: 0 0 0 0 rgba(37,211,102,0) }
 }
 
+/* ── COOKIES BANNER ── */
+.cookies-banner {
+  position: fixed;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  z-index: 55;
+  margin: 0 auto;
+  max-width: 620px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px 12px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(247,242,235,.92);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  box-shadow: 0 14px 30px -20px rgba(61,46,38,.45);
+}
+.cookies-banner p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--brown);
+  line-height: 1.45;
+}
+.cookies-banner a {
+  color: var(--terracotta-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cookies-close {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--cacao);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s ease, border-color .2s ease;
+}
+.cookies-close:hover {
+  background: var(--cream);
+  border-color: rgba(61,46,38,.22);
+}
+.cookies-close span {
+  font-size: 20px;
+  line-height: 1;
+  margin-top: -1px;
+}
+.cookies-banner.is-hidden { display: none; }
+@media (max-width: 640px) {
+  .cookies-banner {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    gap: 8px;
+    padding: 10px 10px 10px 12px;
+  }
+  .cookies-banner p { font-size: 12px; }
+}
+
 /* ── REVEAL ANIMATIONS ── */
 .js-loaded .reveal { opacity: 0; transform: translateY(24px) }
 .js-loaded .reveal.in { animation: reveal-in .9s ease forwards }
@@ -777,4 +842,39 @@ footer.foot { background: var(--cacao); color: var(--bone); padding: 90px 0 30px
   font-size: 17px;
   color: var(--cacao);
   text-wrap: balance;
+}
+
+/* ── PRIVACY PAGE ── */
+.privacy-page { padding-top: 88px; }
+.privacy-hero { padding: 80px 0 30px; }
+.privacy-hero h1 { font-style: italic; font-weight: 300; }
+.privacy-hero .accent { color: var(--terracotta); font-style: normal; font-weight: 500; }
+.privacy-content { padding: 20px 0 100px; }
+.privacy-card {
+  max-width: 860px;
+  background: var(--cream);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 36px 28px;
+  box-shadow: 0 20px 45px -35px rgba(61,46,38,.45);
+}
+.privacy-card h2 {
+  font-size: clamp(24px, 3vw, 32px);
+  margin: 24px 0 8px;
+  font-style: italic;
+  font-weight: 300;
+}
+.privacy-card p {
+  margin: 0;
+  color: var(--brown);
+  line-height: 1.7;
+}
+.privacy-card a {
+  color: var(--terracotta-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 640px) {
+  .privacy-hero { padding-top: 60px; }
+  .privacy-card { padding: 28px 18px; }
 }
