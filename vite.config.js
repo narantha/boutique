@@ -7,8 +7,8 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        home: 'react-pages/home.html',
-        privacidad: 'react-pages/politica-de-privacidad.html'
+        home: 'index.html',
+        privacidad: 'politica-de-privacidad.html'
       }
     }
   }
