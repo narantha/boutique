@@ -1,32 +1,28 @@
 # Migración progresiva a React + Vite (sin romper el sitio actual)
 
-## Estado actual de fases
+## Estado actual
 
-- ✅ **Fase 1 completada:** arquitectura React + Vite creada.
-- ✅ **Fase 2 completada:** rutas reales (`index.html` y `politica-de-privacidad.html`) ya montan React.
-- ⏭️ **Siguiente:** canary de despliegue (Fase 3) y migración total por lotes (Fase 4).
+- ✅ **Fase 1:** arquitectura React + Vite base.
+- ✅ **Fase 2:** shell por ruta funcionando.
+- ✅ **Fase 3 (canary):** solo `politica-de-privacidad.html` queda migrada a React; `index.html` se mantiene en versión estática original para minimizar riesgo.
 
-## Aclaración importante
+## Qué significa Fase 3 aquí
 
-Vas a **seguir viendo** los archivos `index.html` y `politica-de-privacidad.html`, porque en Vite siempre existe un HTML por ruta de entrada.
-La diferencia es que ahora esos archivos son solo un *shell* que monta React en `#root`.
+1. **Home (`/`) sigue estática** mientras validamos estabilidad y métricas.
+2. **Privacidad (`/politica-de-privacidad.html`) corre en React** usando layout reutilizable.
+3. Si el canary sale bien, pasamos la home a React en el siguiente lote.
 
-## Qué se hizo en Fase 2
+## Checklist de validación canary
 
-1. `index.html` ahora monta `src/home-main.jsx`.
-2. `politica-de-privacidad.html` ahora monta `src/privacy-main.jsx`.
-3. Se conservan metadatos SEO básicos en cada HTML y se centraliza la UI repetida en React (`BaseLayout`, `Navbar`, `Footer`).
-
-## Flujo recomendado
-
-1. **Fase 3 (canary):** publicar solo una ruta migrada primero (`/politica-de-privacidad.html`).
-2. Validar métricas: errores JS, rebote, tiempo de carga, CTR de CTA.
-3. Luego publicar home (`/`).
+- Carga correcta en móvil y desktop.
+- Sin errores en consola.
+- Navegación a inicio y política funcionando.
+- Meta title y description correctos.
+- Métricas: rebote y tiempo en página estables.
 
 ## Comandos
 
 ```bash
-npm install
 npm run dev
 npm run build
 npm run preview
