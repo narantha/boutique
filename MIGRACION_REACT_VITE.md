@@ -9,8 +9,8 @@
 ## Importante (para evitar confusión)
 
 - La URL oficial de inicio es **`/`** y sigue siendo HTML estático completo.
-- Si abres `react-pages/home.html`, ahora redirige automáticamente a `/` para evitar ver la home de placeholder.
-- `src/home-main.jsx` quedó solo como redirección de seguridad durante el canary.
+- Si abres `react-pages/home.html`, redirige automáticamente a `/` para evitar ver la home de placeholder.
+- `src/home-main.jsx` incluye protección anti-loop: solo redirige cuando la ruta NO es `/`.
 
 ## Qué significa Fase 3 aquí
 
