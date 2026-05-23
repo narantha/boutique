@@ -4,19 +4,19 @@
 
 - ✅ **Fase 1:** arquitectura React + Vite base.
 - ✅ **Fase 2:** shell por ruta funcionando.
-- ✅ **Fase 3 (canary):** solo `politica-de-privacidad.html` queda migrada a React; `index.html` se mantiene en versión estática original para minimizar riesgo.
+- ✅ **Fase 3 (canary):** `politica-de-privacidad.html` en React y `index.html` compatible con React para evitar pantallas en blanco en entornos donde ya quedó montado `#root`.
 
-## Importante (para evitar confusión)
+## Importante (para evitar pantalla en blanco)
 
-- La URL oficial de inicio es **`/`** y sigue siendo HTML estático completo.
-- Si abres `react-pages/home.html`, redirige automáticamente a `/` para evitar ver la home de placeholder.
-- `src/home-main.jsx` incluye protección anti-loop: solo redirige cuando la ruta NO es `/`.
+- Si `index.html` tiene `<div id="root"></div>` + `<script type="module" src="/src/home-main.jsx"></script>`, ahora **sí renderiza HomePage** (ya no redirige).
+- Esto evita el caso de pantalla blanca que ocurría cuando el entrypoint de home solo redirigía.
+- `react-pages/home.html` puede seguir existiendo como página auxiliar de pruebas.
 
 ## Qué significa Fase 3 aquí
 
-1. **Home (`/`) sigue estática** mientras validamos estabilidad y métricas.
-2. **Privacidad (`/politica-de-privacidad.html`) corre en React** usando layout reutilizable.
-3. Si el canary sale bien, pasamos la home a React en el siguiente lote.
+1. Privacidad (`/politica-de-privacidad.html`) corre en React usando layout reutilizable.
+2. Home puede funcionar en modo estático o en modo React-shell sin quedarse en blanco.
+3. Luego se define el corte final (home estática o home React completa) según métricas.
 
 ## Checklist de validación canary
 

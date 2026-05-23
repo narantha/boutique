@@ -1,5 +1,13 @@
-// Fase 3 canary: Home debe ser estática.
-// Evitamos loops infinitos si por error index.html vuelve a montar este entrypoint.
-if (window.location.pathname !== '/') {
-  window.location.replace('/');
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { HomePage } from './pages/HomePage';
+
+const rootEl = document.getElementById('root');
+
+if (rootEl) {
+  createRoot(rootEl).render(
+    <React.StrictMode>
+      <HomePage />
+    </React.StrictMode>
+  );
 }
