@@ -246,6 +246,13 @@ section { padding: 110px 0; position: relative }
   box-shadow: 0 30px 70px -30px rgba(61,46,38,.3);
   position: relative;
 }
+.story-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .story-stamp {
   position: absolute; right: -22px; bottom: 30px;
   width: 140px; height: 140px; border-radius: 50%;
