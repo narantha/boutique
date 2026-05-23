@@ -1,9 +1,3 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { HomePage } from './pages/HomePage';
-
-createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <HomePage />
-  </React.StrictMode>
-);
+// Fase 3 canary: la home oficial sigue siendo estática.
+// Si se abre accidentalmente este entrypoint, redirigimos al inicio real.
+window.location.replace('/');

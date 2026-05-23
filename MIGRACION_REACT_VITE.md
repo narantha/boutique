@@ -6,6 +6,12 @@
 - ✅ **Fase 2:** shell por ruta funcionando.
 - ✅ **Fase 3 (canary):** solo `politica-de-privacidad.html` queda migrada a React; `index.html` se mantiene en versión estática original para minimizar riesgo.
 
+## Importante (para evitar confusión)
+
+- La URL oficial de inicio es **`/`** y sigue siendo HTML estático completo.
+- Si abres `react-pages/home.html`, ahora redirige automáticamente a `/` para evitar ver la home de placeholder.
+- `src/home-main.jsx` quedó solo como redirección de seguridad durante el canary.
+
 ## Qué significa Fase 3 aquí
 
 1. **Home (`/`) sigue estática** mientras validamos estabilidad y métricas.
