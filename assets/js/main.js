@@ -1,5 +1,5 @@
 /* ── WhatsApp number — replace with real number before going live ── */
-const WA_NUMBER = '51999000000';
+const WA_NUMBER = '+51971998418';
 
 function waLink(msg) {
   return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
