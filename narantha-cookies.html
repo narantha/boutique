@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo — Modal de Cookies Narantha</title>
+
+  <!-- Google Tag Manager — reemplaza GTM-XXXXXXX con tu ID real -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+  <!-- Fin GTM -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #F5F0E8;
+      --ink:   #1A1714;
+      --sage:  #7A8C6E;
+      --sand:  #C8B89A;
+      --warm:  #E8DDD0;
+      --muted: #8A837A;
+      --border: rgba(26,23,20,0.12);
+      --radius: 3px;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    body {
+      background: var(--cream);
+      font-family: var(--font-body);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* ── Demo page background ── */
+    .page-demo {
+      text-align: center;
+      max-width: 480px;
+    }
+    .page-demo h1 {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+    .page-demo p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .demo-btn {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: var(--cream);
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .demo-btn:hover { opacity: 0.8; }
+
+    /* ── Overlay ── */
+    #consent-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,23,20,0.45);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    #consent-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Modal ── */
+    #consent-modal {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      width: 100%;
+      max-width: 560px;
+      padding: 2rem 2rem 1.5rem;
+      transform: translateY(20px);
+      transition: transform 0.35s ease;
+    }
+    #consent-overlay.visible #consent-modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .modal-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+      max-width: 90%;
+    }
+
+    /* ── Cookie rows ── */
+    .cookie-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .cookie-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      background: var(--warm);
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .cookie-row.active { border-color: var(--sand); }
+
+    .cookie-info { flex: 1; }
+    .cookie-name {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+    .cookie-tools {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .badge-required {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--sage);
+      background: rgba(122,140,110,0.15);
+      padding: 2px 7px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* ── Toggle ── */
+    .toggle-wrap { flex-shrink: 0; }
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 21px;
+      cursor: pointer;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: rgba(26,23,20,0.15);
+      border-radius: 21px;
+      transition: background 0.25s;
+    }
+    .toggle-thumb {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      top: 3px;
+      left: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle input:checked ~ .toggle-track { background: var(--sage); }
+    .toggle input:checked ~ .toggle-thumb { transform: translateX(17px); }
+    .toggle input:disabled ~ .toggle-track { opacity: 0.5; cursor: not-allowed; }
+    .toggle input:disabled ~ .toggle-thumb { cursor: not-allowed; }
+
+    /* ── Botones ── */
+    .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      padding: 0.65rem 1.25rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--cream);
+    }
+    .btn-primary:hover { opacity: 0.82; }
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--border);
+    }
+    .btn-outline:hover { background: var(--warm); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border-color: transparent;
+      font-size: 0.73rem;
+      padding: 0.65rem 0.75rem;
+    }
+    .btn-ghost:hover { color: var(--ink); }
+
+    /* ── Saved notice ── */
+    #saved-notice {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--sage);
+      margin-bottom: 1rem;
+      padding: 0.6rem 0.9rem;
+      background: rgba(122,140,110,0.1);
+      border-radius: var(--radius);
+      border: 1px solid rgba(122,140,110,0.25);
+    }
+
+    /* ── GTM log (solo para demo) ── */
+    #gtm-log {
+      margin-top: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      background: rgba(26,23,20,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      line-height: 1.7;
+      white-space: pre;
+    }
+    #gtm-log .label {
+      font-weight: 500;
+      color: var(--ink);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- GTM noscript — reemplaza GTM-XXXXXXX con tu ID real -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<!-- Demo page -->
+<div class="page-demo">
+  <h1>Narantha</h1>
+  <p>Esta es la demo del modal de consentimiento de cookies.<br>
+     En producción aparece automáticamente en la primera visita.</p>
+  <button class="demo-btn" onclick="showConsent()">Ver modal de cookies</button>
+</div>
+
+<!-- Overlay + Modal -->
+<div id="consent-overlay" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+  <div id="consent-modal">
+
+    <div id="saved-notice">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="6.5" stroke="#7A8C6E"/>
+        <path d="M4 7l2 2 4-4" stroke="#7A8C6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span id="saved-text">Preferencias guardadas.</span>
+    </div>
+
+    <div class="modal-header">
+      <h2 class="modal-title" id="consent-title">Cookies</h2>
+    </div>
+    <p class="modal-desc">
+      Usamos cookies para entender cómo se usa el sitio y mostrarte contenido relevante.
+      Puedes elegir qué aceptas.
+    </p>
+
+    <div class="cookie-list">
+
+      <!-- Necesarias -->
+      <div class="cookie-row" id="row-necesarias">
+        <div class="cookie-info">
+          <div class="cookie-name">Necesarias</div>
+          <div class="cookie-tools">Funcionamiento básico del sitio</div>
+        </div>
+        <span class="badge-required">Siempre activas</span>
+        <div class="toggle-wrap">
+          <label class="toggle" aria-label="Cookies necesarias (siempre activas)">
+            <input type="checkbox" checked disabled>
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Medición -->
+      <div class="cookie-row" id="row-medicion">
+        <div class="cookie-info">
+          <div class="cookie-name">Medición</div>
+          <div class="cookie-tools">Google Analytics 4 · Hotjar</div>
+        </div>
+        <div class="toggle-wrap">
+          <label class="toggle" aria-label="Cookies de medición">
+            <input type="checkbox" id="toggle-medicion" checked
+              onchange="updateRow('row-medicion', this.checked)">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Experiencia -->
+      <div class="cookie-row" id="row-experiencia">
+        <div class="cookie-info">
+          <div class="cookie-name">Experiencia</div>
+          <div class="cookie-tools">Microsoft Clarity</div>
+        </div>
+        <div class="toggle-wrap">
+          <label class="toggle" aria-label="Cookies de experiencia">
+            <input type="checkbox" id="toggle-experiencia" checked
+              onchange="updateRow('row-experiencia', this.checked)">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Marketing -->
+      <div class="cookie-row" id="row-marketing">
+        <div class="cookie-info">
+          <div class="cookie-name">Marketing</div>
+          <div class="cookie-tools">Google Ads</div>
+        </div>
+        <div class="toggle-wrap">
+          <label class="toggle" aria-label="Cookies de marketing">
+            <input type="checkbox" id="toggle-marketing"
+              onchange="updateRow('row-marketing', this.checked)">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+      </div>
+
+    </div><!-- /cookie-list -->
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="acceptAll()">Aceptar todo</button>
+      <button class="btn btn-outline" onclick="savePreferences()">Guardar preferencias</button>
+      <button class="btn btn-ghost" onclick="rejectAll()">Solo necesarias</button>
+    </div>
+
+    <!-- Log de GTM — solo visible en esta demo, quitar en producción -->
+    <div id="gtm-log">
+      <span class="label">GTM dataLayer push (demo)</span>esperando interacción...</div>
+
+  </div>
+</div>
+
+<script>
+  /* ─────────────────────────────────────────────
+     CONFIGURACIÓN
+     Cambia el nombre de la cookie si quieres.
+  ───────────────────────────────────────────── */
+  var COOKIE_NAME = 'narantha_consent';
+  var COOKIE_DAYS = 365;
+
+  /* ─────────────────────────────────────────────
+     HELPERS DE COOKIE
+  ───────────────────────────────────────────── */
+  function setCookie(name, value, days) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = name + '=' + encodeURIComponent(value)
+      + ';expires=' + expires.toUTCString()
+      + ';path=/;SameSite=Lax';
+  }
+
+  function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
+  /* ─────────────────────────────────────────────
+     GTM CONSENT MODE v2
+     Esto es lo que GTM leerá para decidir si
+     dispara o no cada tag.
+  ───────────────────────────────────────────── */
+  function pushConsentToGTM(medicion, experiencia, marketing) {
+    window.dataLayer = window.dataLayer || [];
+
+    // Default inicial (se llama ANTES de que GTM cargue sus tags)
+    window.dataLayer.push({
+      event: 'consent_update',
+      consent: {
+        analytics_storage:    medicion    ? 'granted' : 'denied',
+        ad_storage:           marketing   ? 'granted' : 'denied',
+        ad_user_data:         marketing   ? 'granted' : 'denied',
+        ad_personalization:   marketing   ? 'granted' : 'denied',
+        functionality_storage: experiencia ? 'granted' : 'denied',
+        personalization_storage: experiencia ? 'granted' : 'denied',
+      }
+    });
+
+    // Actualiza el log de demo
+    updateLog(medicion, experiencia, marketing);
+  }
+
+  function updateLog(med, exp, mkt) {
+    var log = document.getElementById('gtm-log');
+    log.innerHTML = '<span class="label">GTM dataLayer push (demo)</span>'
+      + 'event: "consent_update"\n'
+      + 'analytics_storage:       "' + (med ? 'granted' : 'denied') + '"    // GA4 + Hotjar\n'
+      + 'functionality_storage:   "' + (exp ? 'granted' : 'denied') + '"    // Clarity\n'
+      + 'ad_storage:              "' + (mkt ? 'granted' : 'denied') + '"    // Google Ads\n'
+      + 'ad_user_data:            "' + (mkt ? 'granted' : 'denied') + '"\n'
+      + 'ad_personalization:      "' + (mkt ? 'granted' : 'denied') + '"';
+  }
+
+  /* ─────────────────────────────────────────────
+     MOSTRAR / OCULTAR
+  ───────────────────────────────────────────── */
+  function showConsent() {
+    document.getElementById('consent-overlay').classList.add('visible');
+  }
+
+  function hideConsent() {
+    document.getElementById('consent-overlay').classList.remove('visible');
+  }
+
+  function showNotice(msg) {
+    var el = document.getElementById('saved-notice');
+    document.getElementById('saved-text').textContent = msg;
+    el.style.display = 'flex';
+    setTimeout(function() { el.style.display = 'none'; }, 3500);
+  }
+
+  /* ─────────────────────────────────────────────
+     ACCIONES DEL MODAL
+  ───────────────────────────────────────────── */
+  function acceptAll() {
+    document.getElementById('toggle-medicion').checked    = true;
+    document.getElementById('toggle-experiencia').checked = true;
+    document.getElementById('toggle-marketing').checked   = true;
+    updateRow('row-medicion', true);
+    updateRow('row-experiencia', true);
+    updateRow('row-marketing', true);
+
+    var prefs = { medicion: true, experiencia: true, marketing: true };
+    setCookie(COOKIE_NAME, JSON.stringify(prefs), COOKIE_DAYS);
+    pushConsentToGTM(true, true, true);
+    showNotice('Todo aceptado. Cookie guardada por ' + COOKIE_DAYS + ' días.');
+    setTimeout(hideConsent, 1200);
+  }
+
+  function rejectAll() {
+    document.getElementById('toggle-medicion').checked    = false;
+    document.getElementById('toggle-experiencia').checked = false;
+    document.getElementById('toggle-marketing').checked   = false;
+    updateRow('row-medicion', false);
+    updateRow('row-experiencia', false);
+    updateRow('row-marketing', false);
+
+    var prefs = { medicion: false, experiencia: false, marketing: false };
+    setCookie(COOKIE_NAME, JSON.stringify(prefs), COOKIE_DAYS);
+    pushConsentToGTM(false, false, false);
+    showNotice('Solo cookies necesarias activas.');
+    setTimeout(hideConsent, 1200);
+  }
+
+  function savePreferences() {
+    var med = document.getElementById('toggle-medicion').checked;
+    var exp = document.getElementById('toggle-experiencia').checked;
+    var mkt = document.getElementById('toggle-marketing').checked;
+
+    var prefs = { medicion: med, experiencia: exp, marketing: mkt };
+    setCookie(COOKIE_NAME, JSON.stringify(prefs), COOKIE_DAYS);
+    pushConsentToGTM(med, exp, mkt);
+    showNotice('Preferencias guardadas.');
+    setTimeout(hideConsent, 1200);
+  }
+
+  /* ─────────────────────────────────────────────
+     ACTUALIZAR ESTILO DE FILA
+  ───────────────────────────────────────────── */
+  function updateRow(rowId, active) {
+    var row = document.getElementById(rowId);
+    if (active) {
+      row.classList.add('active');
+    } else {
+      row.classList.remove('active');
+    }
+  }
+
+  /* ─────────────────────────────────────────────
+     INICIALIZACIÓN
+     Al cargar la página:
+     1. Si ya existe cookie → aplica preferencias sin mostrar modal
+     2. Si no existe → muestra modal automáticamente
+  ───────────────────────────────────────────── */
+  (function init() {
+    // DEFAULT CONSENT antes de que GTM cargue (requerido por Google)
+    // Esto va ANTES del snippet de GTM idealmente, aquí lo hacemos al cargar
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'consent_default',
+      consent: {
+        analytics_storage:       'denied',
+        ad_storage:              'denied',
+        ad_user_data:            'denied',
+        ad_personalization:      'denied',
+        functionality_storage:   'denied',
+        personalization_storage: 'denied',
+        wait_for_update:         500
+      }
+    });
+
+    var stored = getCookie(COOKIE_NAME);
+    if (stored) {
+      try {
+        var prefs = JSON.parse(stored);
+        // Sincroniza toggles
+        document.getElementById('toggle-medicion').checked    = !!prefs.medicion;
+        document.getElementById('toggle-experiencia').checked = !!prefs.experiencia;
+        document.getElementById('toggle-marketing').checked   = !!prefs.marketing;
+        updateRow('row-medicion', !!prefs.medicion);
+        updateRow('row-experiencia', !!prefs.experiencia);
+        updateRow('row-marketing', !!prefs.marketing);
+        // Aplica a GTM
+        pushConsentToGTM(!!prefs.medicion, !!prefs.experiencia, !!prefs.marketing);
+      } catch(e) {
+        showConsent();
+      }
+    } else {
+      // Primera visita: muestra modal tras 300ms
+      setTimeout(showConsent, 300);
+    }
+
+    // Cerrar con Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') hideConsent();
+    });
+  })();
+</script>
+
+</body>
+</html>
