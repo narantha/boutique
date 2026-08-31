@@ -5,25 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Demo — Modal de Cookies Narantha</title>
 
-  <!-- ══════════════════════════════════════════
-       CONSENT DEFAULT — debe ir ANTES de GTM
-       para que Google reciba el estado inicial
-  ══════════════════════════════════════════ -->
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: 'consent_default',
-      consent: {
-        analytics_storage:       'denied',
-        ad_storage:              'denied',
-        ad_user_data:            'denied',
-        ad_personalization:      'denied',
-        functionality_storage:   'denied',
-        personalization_storage: 'denied',
-        wait_for_update:         500
-      }
-    });
-  </script>
 
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -61,305 +42,69 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:        #FAFAF8;
-      --surface:   #FFFFFF;
-      --row-bg:    #F4F2EE;
-      --ink:       #1C1917;
-      --ink-soft:  #44403C;
-      --ink-muted: #78716C;
-      --accent:    #5C7A52;
-      --accent-lt: #D4E2CF;
-      --border:    rgba(28,25,23,0.10);
-      --border-md: rgba(28,25,23,0.18);
-      --radius-sm: 4px;
-      --radius:    8px;
-      --font-d:    'Playfair Display', Georgia, serif;
-      --font-b:    'Inter', sans-serif;
+      --bg: #FAFAF8; --surface: #FFFFFF; --row-bg: #F4F2EE;
+      --ink: #1C1917; --ink-soft: #44403C; --ink-muted: #78716C;
+      --accent: #5C7A52; --accent-lt: #D4E2CF;
+      --border: rgba(28,25,23,0.10); --border-md: rgba(28,25,23,0.18);
+      --radius-sm: 4px; --radius: 8px;
+      --font-d: 'Playfair Display', Georgia, serif;
+      --font-b: 'Inter', sans-serif;
     }
-
-    body {
-      background: var(--bg);
-      font-family: var(--font-b);
-      color: var(--ink);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    /* ── Demo background ── */
+    body { background: var(--bg); font-family: var(--font-b); color: var(--ink); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
     .page-demo { text-align: center; max-width: 420px; }
-    .page-demo h1 {
-      font-family: var(--font-d);
-      font-size: 2.2rem;
-      font-weight: 400;
-      color: var(--ink);
-      margin-bottom: 0.5rem;
-    }
-    .page-demo p {
-      font-size: 0.875rem;
-      color: var(--ink-muted);
-      line-height: 1.65;
-      margin-bottom: 1.75rem;
-    }
-    .demo-btn {
-      font-family: var(--font-b);
-      font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      background: var(--ink);
-      color: #fff;
-      border: none;
-      padding: 0.75rem 2rem;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
+    .page-demo h1 { font-family: var(--font-d); font-size: 2.2rem; font-weight: 400; color: var(--ink); margin-bottom: 0.5rem; }
+    .page-demo p { font-size: 0.875rem; color: var(--ink-muted); line-height: 1.65; margin-bottom: 1.75rem; }
+    .demo-btn { font-family: var(--font-b); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; background: var(--ink); color: #fff; border: none; padding: 0.75rem 2rem; border-radius: var(--radius-sm); cursor: pointer; transition: opacity 0.2s; }
     .demo-btn:hover { opacity: 0.78; }
-
-    /* ── Overlay ── */
-    #consent-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(28,25,23,0.50);
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 1.5rem;
-      z-index: 9999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    #consent-overlay.visible {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    /* ── Modal ── */
-    #consent-modal {
-      background: var(--surface);
-      border: 1px solid var(--border-md);
-      border-radius: 10px;
-      width: 100%;
-      max-width: 540px;
-      padding: 2rem 2rem 1.75rem;
-      transform: translateY(16px);
-      transition: transform 0.3s ease;
-      box-shadow: 0 8px 40px rgba(28,25,23,0.12);
-    }
-    #consent-overlay.visible #consent-modal {
-      transform: translateY(0);
-    }
-
-    /* ── Saved notice ── */
-    #saved-notice {
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8rem;
-      font-weight: 400;
-      color: #2D5426;
-      background: #EAF2E8;
-      border: 1px solid #C2DAC0;
-      border-radius: var(--radius-sm);
-      padding: 0.55rem 0.9rem;
-      margin-bottom: 1.25rem;
-    }
-
-    /* ── Header ── */
-    .modal-title {
-      font-family: var(--font-d);
-      font-size: 1.6rem;
-      font-weight: 500;
-      color: var(--ink);
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.01em;
-    }
-    .modal-desc {
-      font-size: 0.85rem;
-      font-weight: 400;
-      color: var(--ink-soft);
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-    }
-
-    /* ── Cookie rows ── */
-    .cookie-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 1.5rem;
-    }
-    .cookie-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.85rem 1rem;
-      background: var(--row-bg);
-      border-radius: var(--radius-sm);
-      border: 1px solid transparent;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .cookie-row.active {
-      background: #EEF3EC;
-      border-color: #C2DAC0;
-    }
+    #consent-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.50); display: flex; align-items: flex-end; justify-content: center; padding: 1.5rem; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    #consent-overlay.visible { opacity: 1; pointer-events: all; }
+    #consent-modal { background: var(--surface); border: 1px solid var(--border-md); border-radius: 10px; width: 100%; max-width: 540px; padding: 2rem 2rem 1.75rem; transform: translateY(16px); transition: transform 0.3s ease; box-shadow: 0 8px 40px rgba(28,25,23,0.12); }
+    #consent-overlay.visible #consent-modal { transform: translateY(0); }
+    #saved-notice { display: none; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 400; color: #2D5426; background: #EAF2E8; border: 1px solid #C2DAC0; border-radius: var(--radius-sm); padding: 0.55rem 0.9rem; margin-bottom: 1.25rem; }
+    .modal-title { font-family: var(--font-d); font-size: 1.6rem; font-weight: 500; color: var(--ink); margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+    .modal-desc { font-size: 0.85rem; font-weight: 400; color: var(--ink-soft); line-height: 1.7; margin-bottom: 1.5rem; }
+    .cookie-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
+    .cookie-row { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1rem; background: var(--row-bg); border-radius: var(--radius-sm); border: 1px solid transparent; transition: border-color 0.2s, background 0.2s; }
+    .cookie-row.active { background: #EEF3EC; border-color: #C2DAC0; }
     .cookie-info { flex: 1; }
-    .cookie-name {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--ink);
-      margin-bottom: 2px;
-    }
-    .cookie-tools {
-      font-size: 0.775rem;
-      font-weight: 400;
-      color: var(--ink-muted);
-    }
-    .badge-req {
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: #2D5426;
-      background: var(--accent-lt);
-      padding: 3px 8px;
-      border-radius: 20px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* ── Toggle ── */
-    .toggle {
-      position: relative;
-      display: inline-block;
-      width: 40px;
-      height: 22px;
-      flex-shrink: 0;
-      cursor: pointer;
-    }
+    .cookie-name { font-size: 0.875rem; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+    .cookie-tools { font-size: 0.775rem; font-weight: 400; color: var(--ink-muted); }
+    .badge-req { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: #2D5426; background: var(--accent-lt); padding: 3px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+    .toggle { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; cursor: pointer; }
     .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-    .t-track {
-      position: absolute;
-      inset: 0;
-      background: #D6D3D1;
-      border-radius: 22px;
-      transition: background 0.22s;
-    }
-    .t-thumb {
-      position: absolute;
-      width: 16px; height: 16px;
-      top: 3px; left: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.22s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.22);
-    }
+    .t-track { position: absolute; inset: 0; background: #D6D3D1; border-radius: 22px; transition: background 0.22s; }
+    .t-thumb { position: absolute; width: 16px; height: 16px; top: 3px; left: 3px; background: #fff; border-radius: 50%; transition: transform 0.22s; box-shadow: 0 1px 3px rgba(0,0,0,0.22); }
     .toggle input:checked ~ .t-track { background: var(--accent); }
     .toggle input:checked ~ .t-thumb { transform: translateX(18px); }
     .toggle input:disabled ~ .t-track { opacity: 0.55; }
-    .toggle input:disabled { cursor: not-allowed; }
-
-    /* ── Buttons ── */
-    .btn-row {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .btn {
-      font-family: var(--font-b);
-      font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.065em;
-      text-transform: uppercase;
-      border-radius: var(--radius-sm);
-      padding: 0.65rem 1.35rem;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.18s;
-    }
-    .btn-primary {
-      background: var(--ink);
-      color: #fff;
-      border-color: var(--ink);
-    }
+    .btn-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .btn { font-family: var(--font-b); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.065em; text-transform: uppercase; border-radius: var(--radius-sm); padding: 0.65rem 1.35rem; cursor: pointer; border: 1px solid transparent; transition: all 0.18s; }
+    .btn-primary { background: var(--ink); color: #fff; border-color: var(--ink); }
     .btn-primary:hover { opacity: 0.8; }
-    .btn-outline {
-      background: transparent;
-      color: var(--ink);
-      border-color: var(--border-md);
-    }
+    .btn-outline { background: transparent; color: var(--ink); border-color: var(--border-md); }
     .btn-outline:hover { background: var(--row-bg); }
-    .btn-ghost {
-      background: transparent;
-      color: var(--ink-muted);
-      border-color: transparent;
-      font-size: 0.72rem;
-      padding: 0.65rem 0.75rem;
-    }
+    .btn-ghost { background: transparent; color: var(--ink-muted); border-color: transparent; font-size: 0.72rem; padding: 0.65rem 0.75rem; }
     .btn-ghost:hover { color: var(--ink); }
-
-    /* ── GTM log (solo demo) ── */
-    .log-wrap {
-      margin-top: 1.25rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-    }
-    .log-label {
-      background: var(--row-bg);
-      border-bottom: 1px solid var(--border);
-      padding: 0.4rem 0.9rem;
-      font-size: 0.68rem;
-      font-weight: 500;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .log-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: inline-block;
-    }
-    #gtm-log {
-      font-family: 'Courier New', monospace;
-      font-size: 0.73rem;
-      color: var(--ink-soft);
-      background: #FAFAF8;
-      padding: 0.75rem 1rem;
-      line-height: 1.75;
-      white-space: pre;
-    }
+    .log-wrap { margin-top: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+    .log-label { background: var(--row-bg); border-bottom: 1px solid var(--border); padding: 0.4rem 0.9rem; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); display: flex; align-items: center; gap: 6px; }
+    .log-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+    #gtm-log { font-family: 'Courier New', monospace; font-size: 0.73rem; color: var(--ink-soft); background: #FAFAF8; padding: 0.75rem 1rem; line-height: 1.75; white-space: pre; }
     #gtm-log .k { color: #2D5426; font-weight: 500; }
-    #gtm-log .v-ok  { color: #2D5426; }
-    #gtm-log .v-no  { color: #A14040; }
+    #gtm-log .v-ok { color: #2D5426; }
+    #gtm-log .v-no { color: #A14040; }
   </style>
 </head>
 <body>
 
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W422V3D5"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W422V3D5" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-<!-- Demo page -->
 <div class="page-demo">
-  <h1>Narantha</h1>
+  <h1>Test</h1>
   <p>Demo del modal de consentimiento de cookies.<br>En producción aparece automáticamente en la primera visita.</p>
   <button class="demo-btn" onclick="showConsent()">Ver modal de cookies</button>
 </div>
 
-<!-- Overlay + Modal -->
 <div id="consent-overlay" role="dialog" aria-modal="true" aria-labelledby="consent-title">
   <div id="consent-modal">
 
@@ -375,7 +120,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <p class="modal-desc">Usamos cookies para entender cómo se usa el sitio y mostrarte contenido relevante. Puedes elegir qué aceptas.</p>
 
     <div class="cookie-list">
-
       <div class="cookie-row active" id="row-necesarias">
         <div class="cookie-info">
           <div class="cookie-name">Necesarias</div>
@@ -394,8 +138,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="cookie-tools">Google Analytics 4 · Hotjar</div>
         </div>
         <label class="toggle" aria-label="Cookies de medición">
-          <input type="checkbox" id="t-medicion" checked
-            onchange="updateRow('row-medicion',this.checked)">
+          <input type="checkbox" id="t-medicion" checked onchange="updateRow('row-medicion',this.checked)">
           <span class="t-track"></span><span class="t-thumb"></span>
         </label>
       </div>
@@ -406,8 +149,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="cookie-tools">Microsoft Clarity</div>
         </div>
         <label class="toggle" aria-label="Cookies de experiencia">
-          <input type="checkbox" id="t-experiencia" checked
-            onchange="updateRow('row-experiencia',this.checked)">
+          <input type="checkbox" id="t-experiencia" checked onchange="updateRow('row-experiencia',this.checked)">
           <span class="t-track"></span><span class="t-thumb"></span>
         </label>
       </div>
@@ -418,23 +160,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="cookie-tools">Google Ads</div>
         </div>
         <label class="toggle" aria-label="Cookies de marketing">
-          <input type="checkbox" id="t-marketing"
-            onchange="updateRow('row-marketing',this.checked)">
+          <input type="checkbox" id="t-marketing" onchange="updateRow('row-marketing',this.checked)">
           <span class="t-track"></span><span class="t-thumb"></span>
         </label>
       </div>
-
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-primary"  onclick="acceptAll()">Aceptar todo</button>
-      <button class="btn btn-outline"  onclick="savePrefs()">Guardar preferencias</button>
-      <button class="btn btn-ghost"    onclick="rejectAll()">Solo necesarias</button>
+      <button class="btn btn-primary" onclick="acceptAll()">Aceptar todo</button>
+      <button class="btn btn-outline" onclick="savePrefs()">Guardar preferencias</button>
+      <button class="btn btn-ghost"   onclick="rejectAll()">Solo necesarias</button>
     </div>
 
-    <!-- Log demo — eliminar en producción -->
     <div class="log-wrap">
-      <div class="log-label"><span class="log-dot"></span>GTM dataLayer push (demo — eliminar en producción)</div>
+      <div class="log-label"><span class="log-dot"></span>GTM consent (demo — eliminar en producción)</div>
       <div id="gtm-log">Esperando interacción...</div>
     </div>
 
@@ -445,7 +184,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   var COOKIE_NAME = 'narantha_consent';
   var COOKIE_DAYS = 365;
 
-  /* ── Helpers ── */
+  /* ── gtag helper (ya existe si GTM cargó, pero lo definimos por si acaso) ── */
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+
+  /* ── Helpers cookie ── */
   function setCookie(name, val, days) {
     var exp = new Date();
     exp.setTime(exp.getTime() + days * 864e5);
@@ -457,31 +200,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     return m ? decodeURIComponent(m[2]) : null;
   }
 
-  /* ── GTM Consent Mode v2 ── */
+  /* ── GTM Consent Mode v2 — formato correcto con gtag() ── */
   function pushGTM(med, exp, mkt) {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: 'consent_update',
-      consent: {
-        analytics_storage:       med  ? 'granted' : 'denied',
-        ad_storage:              mkt  ? 'granted' : 'denied',
-        ad_user_data:            mkt  ? 'granted' : 'denied',
-        ad_personalization:      mkt  ? 'granted' : 'denied',
-        functionality_storage:   exp  ? 'granted' : 'denied',
-        personalization_storage: exp  ? 'granted' : 'denied'
-      }
+    gtag('consent', 'update', {
+      analytics_storage:       med ? 'granted' : 'denied',
+      ad_storage:              mkt ? 'granted' : 'denied',
+      ad_user_data:            mkt ? 'granted' : 'denied',
+      ad_personalization:      mkt ? 'granted' : 'denied',
+      functionality_storage:   exp ? 'granted' : 'denied',
+      personalization_storage: exp ? 'granted' : 'denied'
     });
 
-    /* Hotjar consent */
-    if (window.hj) {
-      if (med) { hj('consent', 'granted'); }
-      else      { hj('consent', 'denied');  }
-    }
+    /* Hotjar */
+    if (window.hj) { hj('consent', med ? 'granted' : 'denied'); }
 
-    /* Clarity consent */
-    if (window.clarity) {
-      clarity('consent', exp ? true : false);
-    }
+    /* Clarity */
+    if (window.clarity) { clarity('consent', !!exp); }
 
     renderLog(med, exp, mkt);
   }
@@ -490,21 +224,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   function renderLog(med, exp, mkt) {
     document.getElementById('gtm-log').innerHTML =
-      '<span class="k">event</span>: "consent_update"\n' +
-      '<span class="k">analytics_storage</span>:       ' + g(med)  + '   // GA4 + Hotjar\n' +
-      '<span class="k">functionality_storage</span>:   ' + g(exp)  + '   // Clarity\n' +
-      '<span class="k">ad_storage</span>:              ' + g(mkt)  + '   // Google Ads\n' +
-      '<span class="k">ad_user_data</span>:            ' + g(mkt)  + '\n' +
-      '<span class="k">ad_personalization</span>:      ' + g(mkt);
+      'gtag("consent", "update", {\n' +
+      '  <span class="k">analytics_storage</span>:       ' + g(med) + '   // GA4 + Hotjar\n' +
+      '  <span class="k">functionality_storage</span>:   ' + g(exp) + '   // Clarity\n' +
+      '  <span class="k">ad_storage</span>:              ' + g(mkt) + '   // Google Ads\n' +
+      '  <span class="k">ad_user_data</span>:            ' + g(mkt) + '\n' +
+      '  <span class="k">ad_personalization</span>:      ' + g(mkt) + '\n' +
+      '})';
   }
 
   /* ── UI ── */
-  function showConsent() {
-    document.getElementById('consent-overlay').classList.add('visible');
-  }
-  function hideConsent() {
-    document.getElementById('consent-overlay').classList.remove('visible');
-  }
+  function showConsent() { document.getElementById('consent-overlay').classList.add('visible'); }
+  function hideConsent() { document.getElementById('consent-overlay').classList.remove('visible'); }
   function notice(msg) {
     document.getElementById('saved-text').textContent = msg;
     var el = document.getElementById('saved-notice');
@@ -568,9 +299,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         updateRow('row-experiencia', !!p.experiencia);
         updateRow('row-marketing',   !!p.marketing);
         pushGTM(!!p.medicion, !!p.experiencia, !!p.marketing);
-      } catch(e) { setTimeout(showConsent, 300); }
+      } catch(e) { showConsent(); }
     } else {
-      setTimeout(showConsent, 300);
+      showConsent();
     }
     document.addEventListener('keydown', function(e){
       if (e.key === 'Escape') hideConsent();
