@@ -495,6 +495,7 @@ body[data-page="product"] .site-header { background: rgba(255, 253, 250, .94); }
 @media (hover: none), (pointer: coarse) {
   .gallery-viewport > img { transform: none!important; }
 }
+.gtm-noscript-frame { display: none; visibility: hidden; }
 .gallery-thumb:hover img { transform: scale(1.04); }
 .gallery-thumb[aria-current="true"] {
   border-color: #b51f68;
