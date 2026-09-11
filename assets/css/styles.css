@@ -501,3 +501,26 @@ body[data-page="product"] .site-header { background: rgba(255, 253, 250, .94); }
   border-color: #b51f68;
   box-shadow: 0 0 0 2px #b51f68;
 }
+
+/* Changes and returns: shared Narantha palette and typography */
+.returns-page { width: min(100% - 40px, 960px); margin: 0 auto; padding: clamp(48px, 7vw, 90px) 0; }
+.returns-hero { max-width: 800px; margin-bottom: 48px; }
+.returns-hero h1 { font-size: clamp(44px, 6.5vw, 78px); line-height: 1.05; letter-spacing: -.025em; margin-bottom: 24px; }
+.returns-hero h1 em { color: var(--clay); font-weight: 400; }
+.returns-hero > p:not(.kicker) { max-width: 600px; color: var(--muted); font-size: 18px; }
+.returns-note { display: flex; gap: 24px; align-items: center; margin-top: 30px; padding: 22px 26px; border-left: 3px solid var(--clay); background: var(--paper); }
+.returns-note strong { flex-shrink: 0; color: var(--clay); }
+.returns-note span { font-size: 14px; color: var(--muted); }
+.returns-content { max-width: 800px; }
+.returns-content > section { border-top: 1px solid var(--line); padding: 32px 0; }
+.returns-content h2 { font-size: clamp(28px, 3.5vw, 36px); line-height: 1.15; margin-bottom: 20px; }
+.returns-content p { color: var(--muted); line-height: 1.8; }
+.returns-content strong { color: var(--brown); font-weight: 500; }
+.returns-content p:last-child { margin-bottom: 0; }
+.returns-content .returns-contact { padding: 32px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); margin-top: 12px; }
+.returns-contact .button { max-width: 100%; gap: 16px; }
+@media(max-width: 600px) {
+  .returns-note { flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; }
+  .returns-content .returns-contact { padding: 24px 20px; }
+  .returns-contact .button { font-size: 10px; padding: 14px; }
+}
