@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 source = "const fs=require('fs'),vm=require('vm');const code=fs.readFileSync(process.argv[1],'utf8').split('function item(')[0];process.stdout.write(vm.runInNewContext(code+';JSON.stringify(PRODUCTS)'));"
 products = json.loads(subprocess.check_output(['node', '-e', source, str(ROOT / 'assets/js/main.js')]))
 template = (ROOT / 'producto.html').read_text()
-urls = ['https://narantha.com/', *['https://narantha.com/' + path for path in ['politica-de-devoluciones.html', 'politica-de-privacidad.html', 'terminos-y-condiciones.html', 'libro-de-reclamaciones.html']]]
+urls = ['https://narantha.com/', *['https://narantha.com/' + path for path in ['politica-de-devoluciones.html', 'politica-de-privacidad.html', 'terminos-y-condiciones.html', 'libro-de-reclamaciones.html', 'envios-y-pagos.html']]]
 for key, product in products.items():
     kind = 'Vestido' if product['category'] == 'Vestidos' else 'Enterizo'
     name = f"{kind} {product['name']}"

@@ -68,6 +68,48 @@ class StoreTests(unittest.TestCase):
         with app.connect() as connection:
             self.assertEqual(connection.execute('SELECT count(*) FROM orders').fetchone()[0], 0)
 
+    def prepare_cod(self, district='Chorrillos'):
+        self.payload.update(checkout='cod', paymentMethod='yape', delivery='shipping', shipping=1, expectedTotal=26500 if district == 'Miraflores' else 25500)
+        self.payload['customer'].update(region='Lima', district=district, address='Dirección de prueba')
+        self.handler.update_admin('/api/admin/inventory', {'product': 'yismi', 'color': 'Nude', 'size': 'M', 'stock': 5})
+
+    def test_cod_uses_server_shipping_reserves_once_and_stays_unpaid(self):
+        self.prepare_cod()
+        code, order = self.create()
+        self.assertEqual(code, 201)
+        self.assertEqual(order['shipping'], 1500)
+        self.assertEqual(order['total'], 25500)
+        self.assertEqual(order['status'], 'confirmado')
+        self.assertEqual(order['payment'], 'pendiente')
+        self.assertEqual(order['deliveryHours'], 48)
+        self.assertEqual(self.create()[1]['id'], order['id'])
+        with app.connect() as connection:
+            self.assertEqual(connection.execute("SELECT stock FROM variants WHERE product='yismi' AND color='Nude' AND size='M'").fetchone()[0], 3)
+
+    def test_cod_rejects_changed_total_without_reserving(self):
+        self.prepare_cod()
+        self.payload['expectedTotal'] = 1
+        self.assertEqual(self.create()[0], 409)
+        with app.connect() as connection:
+            self.assertEqual(connection.execute("SELECT stock FROM variants WHERE product='yismi' AND color='Nude' AND size='M'").fetchone()[0], 5)
+
+    def test_cod_extended_lima_and_piura_rates(self):
+        self.prepare_cod('Miraflores')
+        self.assertEqual(self.create()[1]['shipping'], 2500)
+        self.payload['requestKey'] = 'test-piura-request-key-12345'
+        self.payload['customer'].update(region='Piura', district='Piura')
+        self.payload['expectedTotal'] = 25500
+        self.assertEqual(self.create()[1]['shipping'], 1500)
+
+    def test_cod_rejects_unknown_coverage_and_missing_stock(self):
+        self.prepare_cod('Distrito no cubierto')
+        self.assertEqual(self.create()[0], 400)
+        self.payload['customer']['district'] = 'Chorrillos'
+        self.handler.update_admin('/api/admin/inventory', {'product': 'yismi', 'color': 'Nude', 'size': 'M', 'stock': None})
+        self.assertEqual(self.create()[0], 409)
+        with app.connect() as connection:
+            self.assertEqual(connection.execute('SELECT count(*) FROM orders').fetchone()[0], 0)
+
     def test_shipping_requires_address_and_consent(self):
         self.payload['delivery'] = 'shipping'
         with self.assertRaises(ValueError):

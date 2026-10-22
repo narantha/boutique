@@ -17,6 +17,7 @@ DB = Path(os.environ.get('NARANTHA_DB', str(ROOT / 'server' / 'data' / 'store.sq
 TOKEN = os.environ.get('NARANTHA_ADMIN_TOKEN', '')
 LOCK = threading.Lock()
 CATALOG = {
+    'dulce': {'name': 'Dulce', 'price': 12000, 'colors': ['Rojo', 'Negro', 'Verde petróleo', 'Celeste', 'Vino', 'Beis', 'Blanco'], 'sizes': ['Estándar (referencial M/L)']},
     'josy': {'name': 'Josy', 'price': 9000, 'colors': ['Beis', 'Verde petróleo', 'Verde oliva'], 'sizes': ['Estándar (S–M)']},
     'yismi': {'name': 'Yismi', 'price': 12000, 'colors': ['Nude', 'Terracota', 'Cacao'], 'sizes': ['M', 'L']},
     'lorena': {'name': 'Lorena', 'price': 12000, 'colors': [''], 'sizes': ['']},
@@ -148,6 +149,9 @@ class Handler(SimpleHTTPRequestHandler):
             if path == '/api/complaints':
                 status, result = complaints.create(data, connect, LOCK)
                 self.reply(status, result)
+            elif path == '/api/checkout':
+                data['checkout'] = 'cod'
+                self.create_order(data)
             elif path == '/api/orders':
                 self.create_order(data)
             elif path.startswith('/api/admin/'):
@@ -186,6 +190,19 @@ class Handler(SimpleHTTPRequestHandler):
         if delivery == 'shipping':
             for name, limit in [('region', 80), ('district', 120), ('address', 250)]:
                 cleaned[name] = text_field(customer, name, limit, True)
+        cod = data.get('checkout') == 'cod'
+        shipping_cost = 0 if delivery == 'pickup' else None
+        if cod:
+            shipping_config = json.loads((ROOT / 'assets/shipping.json').read_text())
+            method = data.get('paymentMethod')
+            if method not in shipping_config['paymentMethods']:
+                raise ValueError('Método de pago inválido')
+            if delivery == 'shipping':
+                matches = [zone for zone in shipping_config['zones'] if zone['region'] == cleaned['region'] and cleaned['district'] in zone['districts']]
+                if len(matches) != 1:
+                    return self.reply(400, {'error': 'El destino no tiene cobertura de contra entrega.'})
+                shipping_cost = matches[0]['fee']
+            cleaned['paymentMethod'] = method
         notes = text_field(data, 'notes', 500)
         items = data.get('items')
         if not isinstance(items, list) or not 1 <= len(items) <= 30:
@@ -196,7 +213,8 @@ class Handler(SimpleHTTPRequestHandler):
             if existing:
                 if existing['request_hash'] != request_hash:
                     return self.reply(409, {'error': 'La solicitud cambió. Actualiza y revisa tus datos.'})
-                return self.reply(200, {'id': existing['id'], 'subtotal': existing['subtotal'], 'status': 'solicitado'})
+                saved = connection.execute('SELECT status,shipping,customer FROM orders WHERE id=?', (existing['id'],)).fetchone()
+                return self.reply(200, {'id': existing['id'], 'subtotal': existing['subtotal'], 'shipping': saved['shipping'], 'total': existing['subtotal'] + (saved['shipping'] or 0), 'status': saved['status'], 'payment': 'pendiente', 'paymentMethod': json.loads(saved['customer']).get('paymentMethod'), 'deliveryHours': 48 if cod else None})
             for line in items:
                 if not isinstance(line, dict):
                     raise ValueError()
@@ -210,14 +228,21 @@ class Handler(SimpleHTTPRequestHandler):
                 variant = connection.execute('SELECT stock FROM variants WHERE product=? AND color=? AND size=?', key).fetchone()
                 if variant is None:
                     raise ValueError()
+                if cod and (variant['stock'] is None or not color or not size):
+                    return self.reply(409, {'error': 'Debemos confirmar existencias y variantes de ' + CATALOG[product]['name'] + ' antes de aceptar la compra. Retira esta prenda o consulta a contacto@narantha.com.'})
                 if variant['stock'] is not None and variant['stock'] < qty:
                     return self.reply(409, {'error': 'La cantidad solicitada de ' + CATALOG[product]['name'] + ' no está disponible.'})
                 price = CATALOG[product]['price']
                 subtotal += price * qty
                 normalized.append({'id': product, 'name': CATALOG[product]['name'], 'color': color, 'size': size, 'qty': qty, 'price': price})
+            if cod and (type(data.get('expectedTotal')) is not int or data['expectedTotal'] != subtotal + shipping_cost):
+                return self.reply(409, {'error': 'El total cambió. Actualiza la página y revisa tu pedido antes de confirmar.'})
+            if cod:
+                for line in normalized:
+                    connection.execute('UPDATE variants SET stock=stock-? WHERE product=? AND color=? AND size=?', (line['qty'], line['id'], line['color'], line['size']))
             identifier = 'NAR-' + secrets.token_hex(6).upper()
-            connection.execute('INSERT INTO orders (id,created,status,customer,items,subtotal,delivery,shipping,notes,request_key,request_hash) VALUES (?,?,?,?,?,?,?,?,?,?,?)', (identifier, datetime.now(timezone.utc).isoformat(), 'solicitado', json.dumps(cleaned), json.dumps(normalized), subtotal, delivery, 0 if delivery == 'pickup' else None, notes, request_key, request_hash))
-        self.reply(201, {'id': identifier, 'subtotal': subtotal, 'status': 'solicitado'})
+            connection.execute('INSERT INTO orders (id,created,status,customer,items,subtotal,delivery,shipping,notes,request_key,request_hash) VALUES (?,?,?,?,?,?,?,?,?,?,?)', (identifier, datetime.now(timezone.utc).isoformat(), 'confirmado' if cod else 'solicitado', json.dumps(cleaned), json.dumps(normalized), subtotal, delivery, shipping_cost, notes, request_key, request_hash))
+        self.reply(201, {'id': identifier, 'subtotal': subtotal, 'shipping': shipping_cost, 'total': subtotal + (shipping_cost or 0), 'status': 'confirmado' if cod else 'solicitado', 'payment': 'pendiente', 'paymentMethod': cleaned.get('paymentMethod'), 'deliveryHours': 48 if cod else None})
 
     def update_admin(self, path, data):
         with LOCK, connect() as connection:

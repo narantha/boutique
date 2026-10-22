@@ -107,3 +107,11 @@ Las fichas canónicas ahora están en `/productos/josy/`, `/productos/yismi/`, `
 La página 404 conserva el error y ofrece un enlace a la colección, sin redirigir automáticamente al inicio. Los enlaces antiguos válidos `producto.html?producto=...` siguen funcionando. Un identificador desconocido muestra producto no encontrado en vez de sustituirlo por Yismi.
 
 Pendiente para resolver el aviso de compra de Google: método de pago real, backend de producción, total de envío conocido, stock y variantes confirmados y correspondencia con las URLs del feed. La solicitud por correo no completa ese requisito. Las correcciones de páginas no equivalen a aprobación de Merchant Center.
+
+## Contra entrega (configuración confirmada)
+
+`assets/shipping.json` es la fuente compartida de tarifas y cobertura. Lima: S/ 15 en Chorrillos, Barranco, Santiago de Surco y San Juan de Miraflores; S/ 25 en los otros 39 distritos de la provincia de Lima. Distrito de Piura: S/ 15. Callao, Castilla y Veintiséis de Octubre no están habilitados sin confirmación de cobertura. Entrega en un máximo de 48 horas. Efectivo, Yape y Plin al recibir; recojo en tienda sin costo.
+
+El checkout revisa el pedido y después confirma mediante `/api/checkout`. No utiliza mailto como sustituto del registro. El servidor recalcula precios/envío, exige stock conocido y variantes definidas, reserva en una transacción y registra estado confirmado con pago pendiente. Los reintentos no duplican pedidos ni descuentan dos veces. La confirmación muestra el número y total sin marcarlo como pagado. Los pedidos históricos de solicitud siguen en `/api/orders`.
+
+Las tarifas se prueban sin usar stock ficticio en la base real. Para activar: registrar cantidades reales por variante en administración y desplegar el backend en alojamiento persistente con HTTPS. GitHub Pages no ejecuta esta API. Sin API, se informa del fallo y no se muestra un pedido ficticio confirmado. Hay 20 pruebas de servidor, incluidas las de tarifas, cobertura, stock y reintentos de contra entrega.
