@@ -120,7 +120,7 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_error(404)
         else:
             target = Path(self.translate_path(path)).resolve()
-            if target != ROOT and ROOT not in target.parents or any(part.startswith('.') or part == 'server' for part in target.relative_to(ROOT).parts) or target.is_dir() and path != '/':
+            if target != ROOT and ROOT not in target.parents or any(part.startswith('.') or part == 'server' for part in target.relative_to(ROOT).parts) or target.is_dir() and not (target / 'index.html').is_file():
                 return self.send_error(404)
             super().do_GET()
 

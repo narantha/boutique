@@ -99,3 +99,11 @@ Fuentes consultadas:
 Los cambios son locales. Falta alojamiento persistente con HTTPS, acceso administrativo configurado, correo operativo y validación de producción antes de presentar la web a Culqi. La integración de cobros Culqi sigue pendiente; estas páginas no afirman que ya exista.
 
 Actualización de privacidad: la tienda muestra Nombre comercial: NARANTHA y no publica nombre personal ni teléfono. La identificación legal completa está pendiente; el libro no se habilita sin ella. Las solicitudes de compra se comparten por correo electrónico.
+
+## Correcciones de páginas para Merchant Center
+
+Las fichas canónicas ahora están en `/productos/josy/`, `/productos/yismi/`, `/productos/lorena/` y `/productos/priscila/`. Ejecutar `python3 boutique/scripts/build-products.py` después de cambiar catálogo o plantilla para regenerar el HTML, metadatos de producto y sitemap. El generador no declara existencias que no se hayan verificado.
+
+La página 404 conserva el error y ofrece un enlace a la colección, sin redirigir automáticamente al inicio. Los enlaces antiguos válidos `producto.html?producto=...` siguen funcionando. Un identificador desconocido muestra producto no encontrado en vez de sustituirlo por Yismi.
+
+Pendiente para resolver el aviso de compra de Google: método de pago real, backend de producción, total de envío conocido, stock y variantes confirmados y correspondencia con las URLs del feed. La solicitud por correo no completa ese requisito. Las correcciones de páginas no equivalen a aprobación de Merchant Center.

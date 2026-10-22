@@ -15,8 +15,9 @@ if(document.body.dataset.page==='home'){
 }
 
 if(document.body.dataset.page==='product'){
-  const key=new URLSearchParams(location.search).get('producto');
-  const p=Object.hasOwn(PRODUCTS,key)?PRODUCTS[key]:PRODUCTS.yismi;
+  const key=document.body.dataset.productId||new URLSearchParams(location.search).get('producto');
+  const p=Object.hasOwn(PRODUCTS,key)?PRODUCTS[key]:null;
+  if(!p){document.title='Producto no encontrado — Narantha';document.getElementById('contenido').innerHTML='<section class="purchase-panel"><h1>Producto no encontrado</h1><p>Revisa el enlace o elige una prenda de nuestra colección.</p><a class="button button-dark" href="index.html#favoritos">Ver la colección</a></section>';const robots=document.createElement('meta');robots.name='robots';robots.content='noindex';document.head.append(robots)}else{
   document.title=`${p.name} — Narantha`;
   document.getElementById('productName').textContent=p.name;
   document.getElementById('productPrice').textContent=p.priceLabel;
@@ -85,4 +86,5 @@ if(document.body.dataset.page==='product'){
   document.querySelectorAll('#sizeOptions .option').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('#sizeOptions .option').forEach(b=>b.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');selectedSize=btn.dataset.value;document.getElementById('selectedSize').textContent=`— ${selectedSize}`;sync()}));
   [mainButton,mobileButton].forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();if(btn.getAttribute('aria-disabled')==='true')return;addToCart(p.id,selectedColor,selectedSize);document.getElementById('cartDialog').showModal()}));
   const dialog=document.getElementById('sizeDialog');document.querySelectorAll('.size-guide-link,[data-open-guide]').forEach(b=>b.addEventListener('click',()=>dialog.showModal()));dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});dialog.querySelector('a').addEventListener('click',()=>dialog.close());sync();
+}
 }
